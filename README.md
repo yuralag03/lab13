@@ -7,72 +7,71 @@
 ### Алгоритм:
 1. **Начало**
 2. Объявить переменные:
-  - `array[N]` - массив
-  - `sum` = 0.0 - сумма
-  - `min_abs_value, min_abs_index` - вспомогательные переменные
-3.  Цикл от 0 до 10:
-   - Ввод переменной: `array[i]`
+  - `MAX_LENGTH` = 200
+  - `text[MAX_LENGTH]`
+  - `word[MAX_LENGTH]`
+  - `ptr`
+  - `count` = 0
+4.  Ввод:
+    - `word`
 4. Присвоение переменных:
-   - `min_abs_value` = fabs(`array[0]`)
-   - `min_abs_index` = 0
-5. Цикл от 0 до 10:
-   - `abs_value` = fabs(`array[i]`)
-     5.1. Проверка условия: `abs_value` < `min_abs_value`
-     - Да
-           - `min_abs_value` = `abs_value`
-           - `min_abs_index` = `i`
-6. Проверка условия: `min_abs_index` < 10 - 1
-- Да
-  6.1. Цикл от 0 до 10:
-        - `sum` += `array[i]`
-7. Вывести результаты расчётов с подстановкой значений в текст.
-8. **Конец**
+   `ptr` = `text`
+5. Цикл пока не кончится `word`:
+  - `start_pos` = `ptr` - `text`
+  - `end_pos` = `start_pos` + strlen(`word`)
+  - `is_word_start` = (`start_pos` == 0 || !`isalnum`(`text[start_pos - 1]`))
+  - `is_word_end` = (`text[end_pos]` == '\0' || !`isalnum(text[end_pos]`))
+    5.1 Проверка условия `is_word_start` && `is_word_end`:
+        - `count`++
+  - `ptr` += strlen(`word`)
+6. Вывести результаты расчётов с подстановкой значений в текст.
+7. **Конец**
 
 ### Блок схема
-![Блок схема алгоритма](lab131.png)
+![Блок схема алгоритма](lab13.png)
 ## 2. Реализация программы:
 ```
 #define _CRT_SECURE_NO_DEPRECATE
-#include <stdio.h>
-#include <math.h>
 #include <locale.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
-#define N 10
+#define MAX_LENGTH 200
 
 int main() {
     setlocale(LC_ALL, "");
-    float array[N];
-    int i;
-    float sum = 0.0;
-    float min_abs_value;
-    int min_abs_index;
+    char text[MAX_LENGTH];
+    char word[MAX_LENGTH];
+    char* ptr;
+    int count = 0;
 
-    printf("Введите %d элементов массива:\n", N);
-    for (i = 0; i < N; i++) {
-        printf("array[%d] = ", i);
-        scanf("%f", &array[i]);
-    }
+    printf("Введите строку: ");
+    fgets(text, MAX_LENGTH, stdin);
 
-    min_abs_value = fabs(array[0]);
-    min_abs_index = 0;
+    text[strcspn(text, "\n")] = '\0';
 
-    for (i = 1; i < N; i++) {
-        float abs_value = fabs(array[i]);
-        if (abs_value < min_abs_value) {
-            min_abs_value = abs_value;
-            min_abs_index = i;
+    printf("Введите слово для поиска: ");
+    scanf("%s", word);
+
+    ptr = text;
+    while ((ptr = strstr(ptr, word)) != NULL) {
+        int start_pos = ptr - text;
+        int end_pos = start_pos + strlen(word);
+
+        int is_word_start = (start_pos == 0 || !isalnum(text[start_pos - 1]));
+        int is_word_end = (text[end_pos] == '\0' || !isalnum(text[end_pos]));
+
+        if (is_word_start && is_word_end) {
+            count++;
         }
-    }
 
-    if (min_abs_index < N - 1) {
-        for (i = min_abs_index + 1; i < N; i++) {
-            sum += array[i];
-        }
+        ptr += strlen(word); 
     }
 
     printf("\nРезультаты:\n");
-    printf("Минимальный по модулю элемент: array[%d] = %.4f\n", min_abs_index, array[min_abs_index]);
-    printf("Сумма элементов после него: %.4f\n", sum);
+    printf("Текст: \"%s\"\n", text);
+    printf("Слово \"%s\" встречается %d раз(а)\n", word, count);
 
     return 0;
 }
